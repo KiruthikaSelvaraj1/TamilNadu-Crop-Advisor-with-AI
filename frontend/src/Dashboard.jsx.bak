@@ -1,0 +1,186 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import CropForm from "./CropForm";
+import VoiceInput from "./VoiceInput";
+import LLMAssistant from "./LLMAssistant";
+
+const Dashboard = () => {
+  const [districts, setDistricts] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [district, setDistrict] = useState("");
+  const [city, setCity] = useState("");
+  const [season, setSeason] = useState("kharif");
+  const [area, setArea] = useState(1);
+  const [recommendedCrops, setRecommendedCrops] = useState([]);
+  const [yieldPrediction, setYieldPrediction] = useState(null);
+  const [weather, setWeather] = useState({});
+  const [humidity, setHumidity] = useState(null);
+  const [pesticideSuggestion, setPesticideSuggestion] = useState("");
+
+  useEffect(() => {
+  axios.get("http://127.0.0.1:5000/districts").then((res) => {
+      setDistricts(res.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (district) {
+  axios.get(`http://127.0.0.1:5000/cities/${district}`).then((res) => {
+        setCities(res.data);
+      });
+    }
+  }, [district]);
+
+  useEffect(() => {
+    if (city) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+        axios
+          .get(`http://127.0.0.1:5000/get_weather?lat=${latitude}&lon=${longitude}`)
+          .then((res) => {
+            setWeather(res.data);
+            setHumidity(res.data.humidity);
+            if (res.data.humidity > 75) {
+              setPesticideSuggestion("Use low-moisture pesticides.");
+            } else {
+              setPesticideSuggestion("Standard pesticides are sufficient.");
+            }
+          });
+      });
+    }
+  }, [city]);
+
+  const handleCropRecommend = async () => {
+  const res = await axios.post("http://127.0.0.1:5000/recommend_crop", {
+      district: district.trim().toLowerCase(),
+      season: season.trim().toLowerCase(),
+      area
+    });
+    setRecommendedCrops(res.data.recommended_crops || []);
+    if (res.data.error) {
+      alert(res.data.error);
+    }
+  };
+
+  const handleYieldPredict = async () => {
+  const res = await axios.post("http://127.0.0.1:5000/predict_yield", {
+      crop: recommendedCrops[0],
+      district: district.trim().toLowerCase(),
+      season: season.trim().toLowerCase(),
+      area
+    });
+    setYieldPrediction(res.data.yield || "Unknown");
+    if (res.data.error) {
+      alert(res.data.error);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
+      <div className="p-6 max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-emerald-800 mb-2">🌾 Tamil Nadu Agriculture Hub</h1>
+          <p className="text-gray-600">Your intelligent farming assistant for better yields</p>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">🌡️ Current Weather</h3>
+            {weather && weather.temperature ? (
+              <div className="space-y-2">
+                <p>Temperature: {weather.temperature}°C</p>
+                <p>Humidity: {weather.humidity}%</p>
+                <div className={`text-sm ${weather.humidity > 75 ? 'text-red-600' : 'text-green-600'}`}>
+                  {weather.humidity > 75 ? '⚠️ High Humidity Alert' : '✅ Optimal Conditions'}
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-500">Loading weather data...</p>
+            )}
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">🌱 Current Season</h3>
+            <div className="space-y-2">
+              <p className="capitalize text-lg">{season}</p>
+              <p className="text-sm text-gray-600">
+                {season === 'kharif' ? 'June - October' : 
+                 season === 'rabi' ? 'November - March' : 'March - June'}
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">📍 Selected Region</h3>
+            <div className="space-y-2">
+              <p className="capitalize">{district || 'Select District'}</p>
+              <p className="text-sm text-gray-600">{city || 'Select City'}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <h2 className="text-2xl font-semibold text-emerald-800 mb-4">Crop Recommendation</h2>
+          
+          {/* Crop Recommendation Form */}
+          <CropForm
+            district={district}
+            setDistrict={setDistrict}
+            season={season}
+            setSeason={setSeason}
+            area={area}
+            setArea={setArea}
+            setRecommendedCrops={setRecommendedCrops}
+          />
+
+      <div className="mt-4 flex gap-4">
+        <button className="bg-green-600 text-white px-4 py-2 rounded" onClick={handleCropRecommend}>
+          🚀 Recommend Crop
+        </button>
+        <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleYieldPredict} disabled={!recommendedCrops.length}>
+          📈 Predict Yield
+        </button>
+      </div>
+
+      {recommendedCrops.length > 0 && (
+        <div className="mt-4">
+          <h3 className="font-semibold">Recommended Crops:</h3>
+          <ul className="list-disc list-inside">
+            {recommendedCrops.map((crop, idx) => (
+              <li key={idx}>{crop}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {yieldPrediction && (
+        <div className="mt-2">
+          <h3 className="font-semibold">Predicted Yield:</h3>
+          <p>{yieldPrediction} tons/hectare</p>
+        </div>
+      )}
+
+      {weather && weather.temperature && (
+        <div className="mt-4 bg-gray-100 p-4 rounded">
+          <h3 className="font-semibold">Weather:</h3>
+          <p>🌡️ Temp: {weather.temperature}°C</p>
+          <p>💧 Humidity: {weather.humidity}%</p>
+        </div>
+      )}
+
+      {pesticideSuggestion && (
+        <div className="mt-2 bg-yellow-100 p-2 rounded">
+          <p>🧪 Pesticide Suggestion: {pesticideSuggestion}</p>
+        </div>
+      )}
+
+      {/* Tamil Voice Input + LLM Assistant */}
+      <VoiceInput onTextDetected={(text) => alert("Voice Detected: " + text)} />
+      <LLMAssistant />
+    </div>
+  );
+};
+
+export default Dashboard;

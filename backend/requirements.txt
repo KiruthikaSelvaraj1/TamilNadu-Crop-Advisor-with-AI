@@ -1,0 +1,13 @@
+Flask==3.0.2
+flask-cors==4.0.0
+scikit-learn==1.4.2
+pandas==2.2.1
+numpy==1.26.4
+joblib==1.4.2
+requests==2.31.0
+flask-jwt-extended==4.6.0
+Werkzeug==3.0.1
+python-dotenv==1.0.1
+SQLAlchemy==2.0.27
+openai==0.27.8
+python-dateutil==2.8.2

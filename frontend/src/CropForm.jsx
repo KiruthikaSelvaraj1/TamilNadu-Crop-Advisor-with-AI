@@ -1,0 +1,143 @@
+import React from "react";
+
+const districts = [
+  "ARIYALUR", "CHENNAI", "COIMBATORE", "CUDDALORE", "DHARMAPURI", "DINDIGUL", 
+  "ERODE", "KANCHIPURAM", "KANNIYAKUMARI", "KARUR", "KRISHNAGIRI", "MADURAI", 
+  "NAGAPATTINAM", "NAMAKKAL", "PERAMBALUR", "PUDUKKOTTAI", "RAMANATHAPURAM", 
+  "SALEM", "SIVAGANGA", "THANJAVUR", "THE NILGIRIS", "THENI", "THIRUVALLUR", 
+  "THIRUVARUR", "TIRUCHIRAPPALLI", "TIRUNELVELI", "TIRUPPUR", "TIRUVANNAMALAI", 
+  "TUTICORIN", "VELLORE", "VILLUPURAM", "VIRUDHUNAGAR"
+];
+
+const seasons = [
+  { id: "kharif", name: "Kharif", months: "June - October", icon: "🌧️" },
+  { id: "rabi", name: "Rabi", months: "November - March", icon: "❄️" },
+  { id: "summer", name: "Summer", months: "March - June", icon: "☀️" },
+  { id: "whole_year", name: "Whole Year", months: "Year-round", icon: "📅" }
+];
+
+const districtInfo = {
+  COIMBATORE: {
+    description: "Major industrial and agricultural hub",
+    majorCrops: ["Cotton", "Sugarcane", "Rice", "Maize"],
+    climate: "Semi-arid",
+    avgRainfall: "700mm"
+  },
+  MADURAI: {
+    description: "Cultural capital with rich agricultural heritage",
+    majorCrops: ["Paddy", "Sugarcane", "Banana", "Cotton"],
+    climate: "Tropical",
+    avgRainfall: "850mm"
+  },
+  THANJAVUR: {
+    description: "Rice bowl of Tamil Nadu",
+    majorCrops: ["Rice", "Coconut", "Banana", "Pulses"],
+    climate: "Tropical wet",
+    avgRainfall: "1000mm"
+  },
+  SALEM: {
+    description: "Known for diverse agricultural production",
+    majorCrops: ["Tapioca", "Sugarcane", "Maize", "Cotton"],
+    climate: "Semi-arid",
+    avgRainfall: "800mm"
+  }
+};
+
+function CropForm({ district, setDistrict, season, setSeason, area, setArea }) {
+  return (
+    <div className="space-y-6">
+      {/* District Selection */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">
+          Select District
+        </label>
+        <div className="relative">
+          <select
+            value={district}
+            onChange={(e) => setDistrict(e.target.value)}
+            className="block w-full pl-3 pr-10 py-2.5 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm rounded-lg shadow-sm"
+          >
+            <option value="">Choose a district</option>
+            {districts.map((d) => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+            <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        
+        {/* District Information Card */}
+        {district && districtInfo[district] && (
+          <div className="mt-2 bg-gray-50 rounded-lg p-3 text-sm">
+            <p className="font-medium text-gray-900">{districtInfo[district].description}</p>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <div>
+                <span className="text-gray-500">Major Crops:</span>
+                <p className="text-gray-900">{districtInfo[district].majorCrops.join(", ")}</p>
+              </div>
+              <div>
+                <span className="text-gray-500">Climate:</span>
+                <p className="text-gray-900">{districtInfo[district].climate}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Season Selection */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">
+          Growing Season
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          {seasons.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setSeason(s.id)}
+              className={`relative rounded-lg px-3 py-2 text-left transition-colors
+                ${season === s.id 
+                  ? 'bg-emerald-50 border-2 border-emerald-500 text-emerald-700' 
+                  : 'border border-gray-300 bg-white hover:bg-gray-50'}`}
+            >
+              <span className="flex items-center space-x-2">
+                <span className="text-xl">{s.icon}</span>
+                <span className="font-medium">{s.name}</span>
+              </span>
+              <span className="block text-sm text-gray-500">{s.months}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Area Input */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">
+          Land Area (hectares)
+        </label>
+        <div className="relative rounded-lg shadow-sm">
+          <input
+            type="number"
+            min="0.1"
+            step="0.1"
+            value={area}
+            onChange={(e) => setArea(e.target.value)}
+            className="block w-full pl-3 pr-12 py-2.5 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm rounded-lg"
+            placeholder="Enter area"
+          />
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <span className="text-gray-500 sm:text-sm">ha</span>
+          </div>
+        </div>
+        <p className="text-sm text-gray-500 mt-1">
+          1 hectare = 2.47 acres = 10,000 square meters
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default CropForm;

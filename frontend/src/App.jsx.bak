@@ -1,0 +1,96 @@
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./Home";
+import Dashboard from "./Dashboard";
+import CropForm from "./CropForm";
+import WeatherForm from "./WeatherForm";
+import YieldForm from "./YieldForm";
+import CropHistory from "./CropHistory";
+import PesticideSuggestion from "./PesticideSuggestion";
+import LLMAssistant from "./LLMAssistant";
+import LoginForm from "./LoginForm";
+import RegisterForm from "./RegisterForm";
+import Navbar from "./Navbar";
+
+export default function App() {
+  return (
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/crop-recommendation" element={<CropForm />} />
+        <Route path="/weather" element={<WeatherForm />} />
+        <Route path="/yield-prediction" element={<YieldForm />} />
+        <Route path="/crop-history" element={<CropHistory />} />
+        <Route path="/pesticide" element={<PesticideSuggestion />} />
+        <Route path="/assistant" element={<LLMAssistant />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
+      </Routes>
+    </Router>
+  );
+}
+  const backgroundImage =
+    "https://images.unsplash.com/photo-1593958163473-1eaa983bdf47?auto=format&fit=crop&w=1950&q=80";
+
+  return (
+    <div
+      className="min-h-screen bg-center bg-cover text-white"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="bg-black bg-opacity-70 min-h-screen p-8 flex flex-col justify-center">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Left Side */}
+          <div>
+            <h1 className="text-4xl font-bold mb-4">
+              🌱 The Importance of Agriculture
+            </h1>
+            <p className="text-lg mb-6">
+              Agriculture is the backbone of Tamil Nadu’s economy, supporting millions of livelihoods and ensuring food security across the state.
+            </p>
+            <h2 className="text-2xl font-semibold text-yellow-400 mb-2">
+              தன் செய்பயிர்ச்சி
+            </h2>
+            <p className="text-md mb-6">
+              AI tools can provide farmers with data-driven recommendations and insights, helping them make more informed farming decisions.
+            </p>
+            <Link to="/dashboard">
+              <button className="bg-white text-green-700 px-6 py-3 rounded-lg shadow-md font-semibold hover:bg-green-200 transition">
+                🚜 Try the Crop Predictor
+              </button>
+            </Link>
+          </div>
+
+          {/* Right Side */}
+          <div>
+            <h1 className="text-4xl font-bold mb-4">
+              🌾 Rich in Diverse Crops
+            </h1>
+            <h2 className="text-2xl font-semibold text-yellow-400 mb-2">
+              தெளிவுமா பயிர்கள்
+            </h2>
+            <p className="text-lg mb-6">
+              Tamil Nadu is home to a wide variety of crops — rice, maize, sugarcane, and millets — contributing significantly to its agricultural output.
+            </p>
+            <h2 className="text-2xl font-semibold text-yellow-400 mb-2">
+              🤖 Why Use AI?
+            </h2>
+            <p className="text-lg">
+              AI can guide farmers with smart insights to reduce costs, improve productivity, and make farming sustainable.
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="text-center text-sm text-white mt-12 opacity-70">
+          ©2025 Tamil Nadu Crop Advisor. All rights reserved.
+        </footer>
+      </div>
+    </div>
+  );
+}
