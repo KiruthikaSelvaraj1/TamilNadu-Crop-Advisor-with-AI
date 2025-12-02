@@ -33,6 +33,13 @@ ENV/
 # Config files with sensitive data
 config.py
 
+# ML Model files (large files)
+*.pkl
+*.h5
+*.pb
+*.onnx
+*.joblib
+
 # Node
 node_modules/
 npm-debug.log
